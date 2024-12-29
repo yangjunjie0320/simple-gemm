@@ -4,6 +4,8 @@ project(sgemm)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+option(NN "Number of running threads" 1)
+
 # download eigen
 include(FetchContent)
 set(EIGEN_GIT https://gitlab.com/libeigen/eigen.git)  
