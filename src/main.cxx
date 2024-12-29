@@ -3,12 +3,13 @@
 #include <cstdlib>
 #include <vector>
 #include <numeric>
-#include <iostream>
 
 #include <Eigen/Dense>
 typedef Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> FloatMatrix;
 
+#ifndef NN
 #define NN 32
+#endif
 
 typedef std::chrono::high_resolution_clock::time_point TimePoint;
 double duration(TimePoint t1, TimePoint t2) {
@@ -35,7 +36,6 @@ FloatMatrix mm_sol(const FloatMatrix& A, const FloatMatrix& B, std::vector<doubl
     return C;
 }
 
-#include <mkl_cblas.h>
 FloatMatrix mm_ref(const FloatMatrix &A, const FloatMatrix &B, std::vector<double> &tt)
 {
     FloatMatrix C(A.rows(), B.cols());
@@ -49,10 +49,7 @@ FloatMatrix mm_ref(const FloatMatrix &A, const FloatMatrix &B, std::vector<doubl
     float beta  = 0.0f;
     
     auto t1 = std::chrono::high_resolution_clock::now();
-    cblas_sgemm(
-        CblasRowMajor, CblasNoTrans, CblasNoTrans, 
-        M, N, L, alpha, A.data(), L, B.data(), N, beta, C.data(), N
-        );
+    C += A * B;
     auto t2 = std::chrono::high_resolution_clock::now();
     double dt = duration(t1, t2);
     tt.push_back(dt);

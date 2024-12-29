@@ -1,13 +1,22 @@
-export CXXFLAGS="-I/home/yangjunjie/opt/anaconda/include/"
+# export CXXFLAGS="-I/home/yangjunjie/opt/anaconda/include/"
+conda create -n simple-gemm python=3.10 anaconda
+conda activate simple-gemm
+conda install conda-forge::openblas
+
 export MKL_NUM_THREADS=1
 export OMP_NUM_THREADS=1
 
-rm -rf /home/yangjunjie/work/simple-gemm/build/;
-mkdir /home/yangjunjie/work/simple-gemm/build/;
-cd /home/yangjunjie/work/simple-gemm/build/;
+# show frequency
+lscpu | grep "CPU MHz"
+# show cache size
+lscpu | grep "Cache size"
+
+export PREFIX=/home/yangjunjie/work/simple-gemm/;
+rm -rf $PREFIX/build/; mkdir $PREFIX/build/;
+cd $PREFIX/build/;
 cmake ..; make VERBOSE=1 -j4; cd -
 
-cd /home/yangjunjie/work/simple-gemm/build/;
+cd $PREFIX/build/;
 for m in 256 512 1024 2048; do
   for f in main-*; do
     if [[ $f != *"j-o3"* ]]; then
