@@ -84,31 +84,35 @@ int main(int argc, char* argv[]) {
         FloatMatrix B;
         B.resize(L, N);
         B.setRandom();
-
-        auto C_ref = mm_ref(A, B, tt1);
+        
         auto C_sol = mm_sol(A, B, tt2);
 
-        auto err = (C_ref - C_sol).array().abs().maxCoeff();
-        assert(err < 1e-3);
+        #ifdef CHECK_CORRECTNESS
+            auto C_ref = mm_ref(A, B, tt1);
+            auto err = (C_ref - C_sol).array().abs().maxCoeff();
+            assert(err < 1e-3);
+        #endif
     }
 
     // remove the largest and smallest values
     std::sort(tt1.begin(), tt1.end());
     tt1.erase(tt1.begin());
     tt1.erase(tt1.end() - 1);
-
-    std::sort(tt2.begin(), tt2.end());
-    tt2.erase(tt2.begin());
-    tt2.erase(tt2.end() - 1);
-
-    // compute mean and std deviation
     double m1 = std::accumulate(tt1.begin(), tt1.end(), 0.0) / tt1.size();
-    double m2 = std::accumulate(tt2.begin(), tt2.end(), 0.0) / tt2.size();
     double s1 = std::sqrt(std::accumulate(tt1.begin(), tt1.end(), 0.0, [m1](double a, double b) { return a + (b - m1) * (b - m1); }) / (tt1.size() - 1));
-    double s2 = std::sqrt(std::accumulate(tt2.begin(), tt2.end(), 0.0, [m2](double a, double b) { return a + (b - m2) * (b - m2); }) / (tt2.size() - 1));
+    printf("MM_SOL t = %6.2e +/- %6.2e, GFLOPS = %6.2f\n", m1, s1, 2.0 * M * L * N / m1 / 1e9);
 
-    printf("MM_REF t = %6.2e +/- %6.2e, GFLOPS = %6.2f\n", m1, s1, 2.0 * M * L * N / m1 / 1e9);
-    printf("MM_SOL t = %6.2e +/- %6.2e, GFLOPS = %6.2f\n", m2, s2, 2.0 * M * L * N / m2 / 1e9);
+    #ifdef CHECK_CORRECTNESS
+        std::sort(tt2.begin(), tt2.end());
+        tt2.erase(tt2.begin());
+        tt2.erase(tt2.end() - 1);
+
+        double m2 = std::accumulate(tt2.begin(), tt2.end(), 0.0) / tt2.size();
+        
+        double s2 = std::sqrt(std::accumulate(tt2.begin(), tt2.end(), 0.0, [m2](double a, double b) { return a + (b - m2) * (b - m2); }) / (tt2.size() - 1));
+
+        printf("MM_REF t = %6.2e +/- %6.2e, GFLOPS = %6.2f\n", m2, s2, 2.0 * M * L * N / m2 / 1e9);
+    #endif
 
     return 0;
 }

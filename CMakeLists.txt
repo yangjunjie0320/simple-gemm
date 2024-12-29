@@ -5,6 +5,12 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(NN "Number of running threads" 1)
+option(CHECK_CORRECTNESS "Check correctness of the implementation" OFF)
+option(BLOCK_SIZE "Block size for the implementation" 64)
+
+add_compile_options(-DNN=${NN})
+add_compile_options(-DBLOCK_SIZE=${BLOCK_SIZE})
+add_compile_options(-DCHECK_CORRECTNESS=${CHECK_CORRECTNESS})
 
 # download eigen
 include(FetchContent)

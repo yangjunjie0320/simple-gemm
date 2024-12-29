@@ -12,7 +12,7 @@ lscpu | grep -A 3 "L1d cache:"
 export PREFIX=$(pwd);
 rm -rf $PREFIX/build/; mkdir $PREFIX/build/;
 cd $PREFIX/build/;
-cmake -DNN=64 -DBLOCK_SIZE=128 ..; make VERBOSE=1 -j4; cd -
+cmake -DNN=20 -DBLOCK_SIZE=128 -DCHECK_CORRECTNESS=1 ..; make VERBOSE=1 -j4; cd -
 
 cd $PREFIX/build/;
 for m in 256 512 1024 2048; do
