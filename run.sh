@@ -6,10 +6,8 @@ conda install conda-forge::openblas conda-forge::benchmark
 export MKL_NUM_THREADS=1
 export OMP_NUM_THREADS=1
 
-# show frequency
-lscpu | grep "CPU MHz"
-# show cache size
-lscpu | grep "Cache size"
+lscpu | grep "Model name:"
+lscpu | grep -A 3 "L1d cache:"
 
 export PREFIX=/home/yangjunjie/work/simple-gemm/;
 rm -rf $PREFIX/build/; mkdir $PREFIX/build/;
