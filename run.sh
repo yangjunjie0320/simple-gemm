@@ -1,7 +1,7 @@
 # export CXXFLAGS="-I/home/yangjunjie/opt/anaconda/include/"
-conda create -n simple-gemm python=3.10 anaconda -y
+# conda create -n simple-gemm python=3.10 anaconda -y
 conda activate simple-gemm
-conda install cmake conda-forge::openblas -y
+# conda install cmake conda-forge::openblas -y
 
 export MKL_NUM_THREADS=1
 export OMP_NUM_THREADS=1
