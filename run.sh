@@ -10,7 +10,7 @@ export OMP_NUM_THREADS=1
 lscpu | grep "Model name:"
 lscpu | grep -A 3 "L1d cache:"
 
-export PREFIX=/home/yangjunjie/work/simple-gemm/;
+export PREFIX=$(pwd);
 rm -rf $PREFIX/build/; mkdir $PREFIX/build/;
 cd $PREFIX/build/;
 cmake -DN=64 ..; make VERBOSE=1 -j4; cd -
