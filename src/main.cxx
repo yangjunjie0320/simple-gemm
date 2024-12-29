@@ -11,6 +11,10 @@ typedef Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Fl
 #define NN 32
 #endif
 
+#ifndef BLOCK_SIZE
+#define BLOCK_SIZE 64
+#endif
+
 typedef std::chrono::high_resolution_clock::time_point TimePoint;
 double duration(TimePoint t1, TimePoint t2) {
     // convert to seconds
@@ -67,16 +71,20 @@ int main(int argc, char* argv[]) {
     int M = std::stoi(argv[1]);
     int N = std::stoi(argv[2]);
     int L = std::stoi(argv[3]);
+    assert(M % BLOCK_SIZE == 0);
+    assert(N % BLOCK_SIZE == 0);
+    assert(L % BLOCK_SIZE == 0);
     printf("M = %d, N = %d, L = %d\n", M, N, L);
 
     for (int i = 0; i < NN; i++) {
         FloatMatrix A;
         A.resize(M, L);
         A.setRandom();
+
         FloatMatrix B;
         B.resize(L, N);
         B.setRandom();
-        
+
         auto C_ref = mm_ref(A, B, tt1);
         auto C_sol = mm_sol(A, B, tt2);
 
@@ -92,18 +100,6 @@ int main(int argc, char* argv[]) {
     std::sort(tt2.begin(), tt2.end());
     tt2.erase(tt2.begin());
     tt2.erase(tt2.end() - 1);
-
-    // std::cout << "tt1: ";
-    // for (auto const &val : tt1) {
-    //     std::cout << val << " ";
-    // }
-    // std::cout << std::endl;
-
-    // std::cout << "tt2: ";
-    // for (auto const &val : tt2) {
-    //     std::cout << val << " ";
-    // }
-    // std::cout << std::endl;
 
     // compute mean and std deviation
     double m1 = std::accumulate(tt1.begin(), tt1.end(), 0.0) / tt1.size();

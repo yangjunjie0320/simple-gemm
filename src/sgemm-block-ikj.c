@@ -1,6 +1,8 @@
 // #include <assert.h>
 
+#ifndef BLOCK_SIZE
 #define BLOCK_SIZE 64
+#endif
 #define min(x, y) (((x) < (y)) ? (x) : (y))
 
 // A.shape = (M, L), B.shape = (L, N), C.shape = (M, N)

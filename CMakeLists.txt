@@ -11,10 +11,13 @@ include(FetchContent)
 set(EIGEN_GIT https://gitlab.com/libeigen/eigen.git)  
 set(EIGEN_VERSION 3.4.0)
 
+# do not compile eigen
 FetchContent_Declare(
     eigen
     GIT_REPOSITORY ${EIGEN_GIT}
     GIT_TAG ${EIGEN_VERSION}
+    BUILD_COMMAND ""
+    INSTALL_COMMAND ""
 )
 
 FetchContent_MakeAvailable(eigen)
