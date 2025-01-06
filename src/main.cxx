@@ -4,6 +4,10 @@
 #include <vector>
 #include <numeric>
 
+#ifndef CHECK
+#define CHECK 0
+#endif
+
 #include <Eigen/Dense>
 typedef Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> FloatMatrix;
 
@@ -19,29 +23,29 @@ extern "C" {
 }
 
 FloatMatrix mm_sol(const FloatMatrix& ma, const FloatMatrix& mb, std::vector<double> &tt) {
-    float* pa = ma.data();
-    float* pb = mb.data();
+    float* pa = (float*) ma.data();
+    float* pb = (float*) mb.data();
+
+    int mm = ma.rows();
+    int ll = ma.cols();
+    int kk = mb.cols();
+
+    auto mc = FloatMatrix(mm, kk);
+    mc.setZero();
     float* pc = mc.data();
 
-    int m = A.rows();
-    int k = B.cols();
-    int l = A.cols();
-
-    auto mc = FloatMatrix(m, n);
-    mc.setZero();
-
-    assert(ma.rows() == m && ma.cols() == l);
-    assert(mb.rows() == l && mb.cols() == k);
-    assert(mc.rows() == m && mc.cols() == k);
+    assert(ma.rows() == mm && ma.cols() == ll); // A.shape == (mm, ll)
+    assert(mb.rows() == ll && mb.cols() == kk); // B.shape == (ll, kk)
+    assert(mc.rows() == mm && mc.cols() == kk); // C.shape == (mm, kk)
 
     auto t1 = std::chrono::high_resolution_clock::now();
-    sgemm(pc, pa, pb, m, k, l);
+    sgemm(pc, pa, pb, mm, ll, kk);
     auto t2 = std::chrono::high_resolution_clock::now();
 
     double dt = duration(t1, t2);
     tt.push_back(dt);
 
-    return C;
+    return mc;
 }
 
 FloatMatrix mm_ref(const FloatMatrix &ma, const FloatMatrix &mb, std::vector<double> &tt)
@@ -77,6 +81,7 @@ double average(std::vector<double> &xx) {
 
 double deviation(std::vector<double> &xx) {
     assert(xx.size() > 1);
+    int d = xx.size() - 1;
 
     double x0 = 0.0;
     for (auto x : xx) {
@@ -84,11 +89,11 @@ double deviation(std::vector<double> &xx) {
     }
     x0 = x0 / xx.size();
 
-    double d = 0.0;
+    double n = 0.0;
     for (auto x : xx) {
-        d += (x - x0) * (x - x0);
+        n += (x - x0) * (x - x0);
     }
-    return std::sqrt(d / (xx.size() - 1));
+    return std::sqrt(n / d);
 }
 
 int main(int argc, char* argv[]) {
@@ -108,23 +113,23 @@ int main(int argc, char* argv[]) {
         B.resize(L, L);
         B.setRandom();
 
-        #ifdef CHECK
+        auto C1 = mm_sol(A, B, tt1);
+
+        if (CHECK) {
             auto C0 = mm_ref(A, B, tt0);
             auto err = (C0 - C1).array().abs().maxCoeff();
             assert(err < 1e-3);
-        #endif
-        
-        auto C1 = mm_sol(A, B, tt1);
+        }
     }
 
-    #ifdef CHECK
+    if (CHECK) {
         std::sort(tt0.begin(), tt0.end());
         tt0.erase(tt0.begin());
         tt0.erase(tt0.end() - 1);
 
         auto gg0 = gflops(tt0, L);
         printf("MM_REF t = %6.2e +/- %6.2e, GFLOPS = %6.2f +/- %6.2f\n", average(tt0), deviation(tt0), average(gg0), deviation(gg0));
-    #endif
+    }
 
     std::sort(tt1.begin(), tt1.end());
     tt1.erase(tt1.begin());

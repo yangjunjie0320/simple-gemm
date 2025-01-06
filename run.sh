@@ -9,18 +9,20 @@ export OMP_NUM_THREADS=1
 
 export PREFIX=$(pwd);
 rm -rf $PREFIX/build/; mkdir $PREFIX/build/; cd $PREFIX/build/;
-cmake -DCHECK=1 ..; make VERBOSE=1 -j4; cd -
+cmake -DCHECK=0 ..; make VERBOSE=1 -j4; cd -
 
 cd $PREFIX/build/;
-for l in 64 128 192 256 320 384 448 512 640 768 896 1024; do
+for i in $(seq 1 20); do
   for f in main-*; do
-    if ! [[ $f == *"block"* ]]; then
-      continue;
-    fi
+    # if ! [[ $f == *"block"* ]]; then
+    #   continue;
+    # fi
+
+    l=$(($i * 64))
 
     echo ""
     echo "Running $f with arguments $l ..."
-    ./$f "$l" "10"
+    ./$f "$l" "20"
     # perf stat -e cache-references,cache-misses \
     #       -e instructions,cycles \
     #       ./$f "$m" "$m" "$m"
