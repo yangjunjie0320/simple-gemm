@@ -8,7 +8,7 @@
 //     }
 // }
 
-void sgemm(float* pa, float* pb, float* pc, int m, int n, int l) {
+void sgemm(float* pc, float* pa, float* pb, int m, int k, int n) {
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
             float cij = 0;
